@@ -275,9 +275,46 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	int pos = 0;
+	int degrees = 360 / a_nSubdivisions;
+	pos += degrees;
+	double radions= (PI/180)*pos;
+
+	vector3 point0(0, a_fHeight / 2, 0); //top
+	vector3 point1(0, -a_fHeight / 2, 0); //bottom
+	vector3 point2(cos(radions), -a_fHeight / 2, sin(radions)); //start
+	vector3 lastvector(point2);
+
+	//top cone
+	for (int i = 0; i < a_nSubdivisions-1; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point3(cos(radions), -a_fHeight / 2, sin(radions));
+		AddTri(point3*a_fRadius, lastvector*a_fRadius, point0);
+	    lastvector=point3;
+		
+	}
+	AddTri(point2*a_fRadius, lastvector*a_fRadius, point0);
+	
+	//reset
+	pos = degrees;
+	lastvector = point2;
+	radions = (PI / 180)*pos;
+	
+	//bottom
+	for (int i = 0; i < a_nSubdivisions-1 ; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point3(cos(radions), -a_fHeight / 2, sin(radions));
+		AddTri(lastvector*a_fRadius, point3*a_fRadius, point1*a_fRadius);
+		lastvector = point3;
+
+	}
+	AddTri(lastvector*a_fRadius, point2*a_fRadius, point1*a_fRadius);
+
+
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -296,12 +333,77 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
 
+	int pos = 0;
+	int degrees = 360 / a_nSubdivisions;
+	pos += degrees;
+	double radions = (PI / 180)*pos;
+
+	vector3 point0(0, a_fHeight / 2, 0); //top
+	vector3 point1(0, -a_fHeight / 2, 0); //bottom
+	vector3 point2(cos(radions), -a_fHeight / 2, sin(radions)); //right bottom
+	vector3 point4(cos(radions), a_fHeight / 2, sin(radions)); //right top
+
+	vector3 lastvector(point2);
+	vector3 lastvector1(point4);
+
+
+
+
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+
+	//round part of cylynder
+   
+	for (int i = 0; i < a_nSubdivisions-1 ; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point3(cos(radions), -a_fHeight / 2, sin(radions));//bottom left
+		vector3 point5(cos(radions), a_fHeight / 2, sin(radions));//top left
+		AddQuad(point3*a_fRadius, lastvector*a_fRadius, point5*a_fRadius,lastvector1*a_fRadius);
+		lastvector = point3; //bot
+		lastvector1 = point5;//top
+
+	}
+	AddQuad(point2*a_fRadius, lastvector*a_fRadius, point4*a_fRadius, lastvector1*a_fRadius);
+
+
+	//reset
+
+	pos = degrees;
+	lastvector = point2;
+    radions = (PI / 180)*pos;
+
+	//bottom
+	for (int i = 0; i < a_nSubdivisions-1 ; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point3(cos(radions), -a_fHeight / 2, sin(radions));
+		AddTri(lastvector*a_fRadius, point3*a_fRadius, point1*a_fRadius);
+		lastvector = point3;
+
+	}
+     AddTri(lastvector*a_fRadius, point2*a_fRadius, point1*a_fRadius);
+
+	//reset
+	pos = degrees;
+	lastvector = point2;
+	radions = (PI / 180)*pos;
+
+	//top
+	for (int i = 0; i < a_nSubdivisions-1 ; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point3(cos(radions), a_fHeight / 2, sin(radions));
+		AddTri(point3*a_fRadius, lastvector*a_fRadius, point0*a_fRadius);
+		lastvector = point3;
+
+	}
+	AddTri(point4*a_fRadius, lastvector*a_fRadius, point0*a_fRadius);
+	
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
