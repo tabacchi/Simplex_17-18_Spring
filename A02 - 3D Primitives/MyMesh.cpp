@@ -389,7 +389,7 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 
 	//reset
 	pos = degrees;
-	lastvector = point2;
+	lastvector = point4;
 	radions = (PI / 180)*pos;
 
 	//top
@@ -428,12 +428,99 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
 
+
+	int pos = 0;
+	int degrees = 360 / a_nSubdivisions;
+	pos += degrees;
+	double radions = (PI / 180)*pos;
+
+	vector3 point0(0, a_fHeight / 2, 0); //top
+	vector3 point1(0, -a_fHeight / 2, 0); //bottom
+	vector3 point2(cos(radions)*a_fInnerRadius, -a_fHeight / 2, sin(radions)*a_fInnerRadius); //right inner bot
+	vector3 point3(cos(radions)*a_fOuterRadius, -a_fHeight / 2, sin(radions)*a_fOuterRadius); //right outter bot
+	vector3 point4(cos(radions)*a_fInnerRadius, a_fHeight / 2, sin(radions)*a_fInnerRadius); //right inner top
+	vector3 point5(cos(radions)*a_fOuterRadius, a_fHeight / 2, sin(radions)*a_fOuterRadius); //right outer top
+
+
+	vector3 lastvector(point3);//rb
+	vector3 lastvector1(point5);//rt
+
+
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	//outter round part
+	for (int i = 0; i < a_nSubdivisions - 1; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point6(cos(radions)*a_fOuterRadius, -a_fHeight / 2, sin(radions)*a_fOuterRadius);//bottom left
+		vector3 point7(cos(radions)*a_fOuterRadius, a_fHeight / 2, sin(radions)*a_fOuterRadius);//top left
+		AddQuad(point6, lastvector, point7, lastvector1);
+		lastvector = point6; //bot
+		lastvector1 = point7;//top
+
+	}
+	AddQuad(point3, lastvector, point5, lastvector1);
+
+	//reset
+	pos = degrees;
+	lastvector = point2;
+	lastvector1=point4;//rt
+	radions = (PI / 180)*pos;
+
+	//inner round part
+	for (int i = 0; i < a_nSubdivisions - 1; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point6(cos(radions)*a_fInnerRadius, -a_fHeight / 2, sin(radions)*a_fInnerRadius);//bottom left
+		vector3 point7(cos(radions)*a_fInnerRadius, a_fHeight / 2, sin(radions)*a_fInnerRadius);//top left
+		AddQuad(lastvector, point6, lastvector1, point7);
+		lastvector = point6; //bot
+		lastvector1 = point7;//top
+
+	}
+	AddQuad(lastvector, point2, lastvector1, point4);
+
+	pos = degrees;
+	lastvector = point4;//inner
+	lastvector1 = point5;//outer
+	radions = (PI / 180)*pos;
+
+	//top
+	for (int i = 0; i < a_nSubdivisions - 1; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point6(cos(radions)*a_fInnerRadius, a_fHeight / 2, sin(radions)*a_fInnerRadius);//inner front
+		vector3 point7(cos(radions)*a_fOuterRadius, a_fHeight / 2, sin(radions)*a_fOuterRadius);//outer front
+		AddQuad(lastvector1, lastvector, point7, point6);
+		lastvector = point6; //inner back 
+		lastvector1 = point7;//outer back
+
+	}
+	AddQuad(lastvector1, lastvector, point5, point4);
+
+	pos = degrees;
+	lastvector = point2;//inner
+	lastvector1 = point3;//outer
+	radions = (PI / 180)*pos;
+
+	//bot
+	for (int i = 0; i < a_nSubdivisions - 1; i++)
+	{
+		pos += degrees;
+		radions = (PI / 180)*pos;
+		vector3 point6(cos(radions)*a_fInnerRadius, -a_fHeight / 2, sin(radions)*a_fInnerRadius);//inner front
+		vector3 point7(cos(radions)*a_fOuterRadius, -a_fHeight / 2, sin(radions)*a_fOuterRadius);//outer front
+		AddQuad(lastvector, lastvector1, point6, point7);
+		lastvector = point6; //inner back 
+		lastvector1 = point7;//outer back
+
+	}
+	AddQuad(lastvector, lastvector1, point2, point3);
+
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
