@@ -13,7 +13,7 @@ GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path)
 			vertexShaderSource += "\n" + Line;
 		vertexShaderStream.close();
 	}
-	//
+	
 	else //not able to find the file
 	{
 		printf("Impossible to open %s. Are you in the right directory?\n", vertex_file_path);

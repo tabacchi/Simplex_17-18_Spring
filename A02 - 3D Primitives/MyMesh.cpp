@@ -621,7 +621,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 			{
 				pos += degrees;
 
-
+				//
 				radions = (PI / 180)*pos;
 				vector3 point5(cos(radions), lowerheight, sin(radions));//bottom left
 				vector3 point6(cos(radions), upperheight, sin(radions));//top left
