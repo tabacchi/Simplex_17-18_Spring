@@ -572,12 +572,92 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	if (a_nSubdivisions > 6)
 		a_nSubdivisions = 6;
 
+
+	int pos = 0;
+	int degrees = 360 / a_nSubdivisions;
+	pos += degrees;
+	double radions = (PI / 180)*pos;
+	double semicircleHeight = (a_nSubdivisions / 2);
+	double startheight = a_fRadius / semicircleHeight;
+
+	double lowerheight;
+	double upperheight=0;
+
+	vector3 point0(0, a_fRadius, 0); //top
+	vector3 point1(0, -a_fRadius / 2, 0); //bottom
+	vector3 point2(cos(radions), -startheight, sin(radions)); //bottom ring
+	vector3 point4(cos(radions), startheight, sin(radions)); //top ring
+
+	vector3 point3(cos(radions), 0, sin(radions)); //base for no height
+
+
+
+	vector3 lastvector(point2);//top
+	vector3 lastvector1(point3);//mid
+	vector3 lastvector2(point4);//bot
+	
+
+	
+
+
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+//top semicircle
+	for (int i = 0; i < a_nSubdivisions / 2; i++)
+	{
+		lowerheight = upperheight;
+		
+		if (a_nSubdivisions / 2 == i)
+		{
+			upperheight = a_fRadius;
+			lastvector = (point2);
+			lastvector1 = point3;
+
+			lastvector.y = upperheight;
+			lastvector1.y = lowerheight;
+
+			for (int j = 0; j < a_nSubdivisions - 1; j++)
+			{
+				pos += degrees;
+
+
+				radions = (PI / 180)*pos;
+				vector3 point5(cos(radions), lowerheight, sin(radions));//bottom left
+				vector3 point6(cos(radions), upperheight, sin(radions));//top left
+				AddTri(point5*a_fRadius, lastvector1*a_fRadius, point6*a_fRadius);
+				lastvector1 = point5; //bot
+				lastvector = point6;//top
+			}
+			AddQuad(lastvector1*a_fRadius, point3*a_fRadius, lastvector*a_fRadius, point2*a_fRadius);
+		}
+		else {
+		upperheight += startheight;
+		lastvector = (point2);
+		lastvector1 = point3;
+
+		lastvector.y = upperheight;
+		lastvector1.y = lowerheight;
+		for (int j = 0; j < a_nSubdivisions-1; j++)
+		{
+			pos += degrees;
+			
+
+			radions = (PI / 180)*pos;
+			vector3 point5(cos(radions), lowerheight, sin(radions));//bottom left
+			vector3 point6(cos(radions), upperheight, sin(radions));//top left
+			AddQuad(point5*a_fRadius, lastvector1*a_fRadius, point6*a_fRadius, lastvector*a_fRadius);
+			lastvector1 = point5; //bot
+			lastvector = point6;//top
+		}
+		AddQuad(lastvector1*a_fRadius, point3*a_fRadius, lastvector*a_fRadius, point2*a_fRadius);
+
+		}
+			
+		
+
+	}
+
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);

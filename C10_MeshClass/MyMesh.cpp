@@ -9,6 +9,7 @@ void MyMesh::Init(void)
 
 	m_pShaderMngr = ShaderManager::GetInstance();
 }
+//
 void MyMesh::Release(void)
 {
 	m_pShaderMngr = nullptr;
