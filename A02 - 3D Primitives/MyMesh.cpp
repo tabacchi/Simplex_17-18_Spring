@@ -610,11 +610,9 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		
 		if (a_nSubdivisions / 2 == i)
 		{
-			upperheight = a_fRadius;
+			
 			lastvector = (point2);
-			lastvector1 = point3;
-
-			lastvector.y = upperheight;
+			lastvector1 = point0;
 			lastvector1.y = lowerheight;
 
 			for (int j = 0; j < a_nSubdivisions - 1; j++)
@@ -625,7 +623,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 				radions = (PI / 180)*pos;
 				vector3 point5(cos(radions), lowerheight, sin(radions));//bottom left
 				vector3 point6(cos(radions), upperheight, sin(radions));//top left
-				AddTri(point5*a_fRadius, lastvector1*a_fRadius, point6*a_fRadius);
+				AddTri(point5*a_fRadius, lastvector1*a_fRadius, point0*a_fRadius);
 				lastvector1 = point5; //bot
 				lastvector = point6;//top
 			}
@@ -642,7 +640,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		{
 			pos += degrees;
 			
-
+			//
 			radions = (PI / 180)*pos;
 			vector3 point5(cos(radions), lowerheight, sin(radions));//bottom left
 			vector3 point6(cos(radions), upperheight, sin(radions));//top left
