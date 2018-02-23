@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
-	m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Thomas Tabacchi twt6012@rit.edu";
 	
 	//Set the position and target of the camera
 	//(I'm at [0,0,10], looking at [0,0,0] and up is the positive Y axis)
@@ -56,6 +56,12 @@ void Application::Display(void)
 	// Clear the screen
 	ClearScreen();
 
+	//Get a timer
+	static float fTimer = 0;	//store the new timer
+	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
+
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix(); //view Matrix
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix(); //Projection Matrix
 	matrix4 m4Offset = IDENTITY_M4; //offset of the orbits, starts as the global coordinate system
@@ -64,18 +70,60 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 90.0f, AXIS_Z);
 
+	//get the divider for the lerp
+	static int ticount = 2;
+
+	//get the subtraction for the timer so that the lerp works
+	static int ticount1 = 0;
+	//get end position
+	vector3 v3EndPos;
+
+	//interp flaot num
+	static float interp = 0.0f;
+
+	//what number im on for start and end position
+	static uint counter = 0;
+
+	 float fSize = 1.0f-.05f; //initial size of orbits
+	 uint uSides = 3;
+	 static bool go = true;
+	 static int pos = 0;
+	 static std::vector<std::vector<vector3>> positions;
+	 static std::vector<vector3> positionsToAdd;
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
+		int degrees = 360 / uSides;
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 90.0f, AXIS_X));
+		pos = 0;
+		double radions = (PI / 180)*pos;
+
+		if (go == true)
+		{
+			for (uint j = 0; j < uSides; j++)
+			{
+				positionsToAdd.push_back(vector3(vector3(cos(radions), sin(radions), 0) *fSize));
+				pos += degrees;
+				radions = (PI / 180)*pos;
+
+			}
+		positions.push_back(positionsToAdd);
+		}
+		positionsToAdd.clear();
 
 		//calculate the current position
-		vector3 v3CurrentPos = ZERO_V3;
+		vector3 v3CurrentPos = positions[i][counter];
+		
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
-
+		fSize += .5f;
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
+		uSides += 1;
 	}
+	counter += 1;
+	go = false;
+
+	positionsToAdd.clear();
 
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
