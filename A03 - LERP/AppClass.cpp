@@ -113,14 +113,34 @@ void Application::Display(void)
 
 		//calculate the current position
 		vector3 v3CurrentPos = positions[i][counter];
+		v3EndPos = positions[i][counter + 1];
+		interp = (fTimer - ticount1) / 2;
 		
-		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
+
+		matrix4 m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
+
 		fSize += .5f;
+		uSides += 1;
+
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
-		uSides += 1;
+		//LOOOOOOKKKKK HEEEEEER WHEN RETURNING 
+		//YOU WANT TO USE MODUALS TO RESET LIKE THIS 
+		//IF COUNTER>SIDES
+		//COUNTER%SIDES
+		//EX 4/3==1
+		//THAT IS THEORETICLY HOW TO SET UP REMEMBER YOU LEFT THIS NOTE
+		//YOU MADE IT BIG FOR A REASON
+		//DONT FORGET ABOUT MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+		
 	}
-	counter += 1;
+	if ((int)fTimer / ticount == 1)
+	{
+
+		counter += 1;
+		ticount += 2;
+		ticount1 += 2;
+	}
 	go = false;
 
 	positionsToAdd.clear();
