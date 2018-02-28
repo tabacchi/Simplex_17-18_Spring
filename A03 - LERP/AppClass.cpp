@@ -83,18 +83,24 @@ void Application::Display(void)
 
 	//what number im on for start and end position
 	static uint counter = 0;
+	
 	int modual=0;
 	 float fSize = 1.0f-.05f; //initial size of orbits
+	 //sides the tri has
 	 uint uSides = 3;
+	 //checks if it got all the veticies for orbitss
 	 static bool go = true;
 	
 	 static int pos = 0;
+	 //a vector of vectors of vec3s
 	 static std::vector<std::vector<vector3>> positions;
+	 //positions to add to the previous vector
 	 static std::vector<vector3> positionsToAdd;
 	
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
+		//gets the degrees for making orbits
 		int degrees = 360 / uSides;
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 90.0f, AXIS_X));
 		pos = 0;
@@ -102,6 +108,7 @@ void Application::Display(void)
 
 		if (go == true)
 		{
+			//gets all the positions of the orbits once
 			for (uint j = 0; j < uSides; j++)
 			{
 				positionsToAdd.push_back(vector3(vector3(cos(radions), sin(radions), 0) *fSize));
@@ -116,22 +123,27 @@ void Application::Display(void)
 		//calculate the current position
 		vector3 v3CurrentPos;
 
+		// if it is the last vertex it will go back to the beggining
 		if (counter == uSides-1||counter%uSides==uSides-1)
 		{
 			v3CurrentPos = positions[i][uSides - 1];
 			v3EndPos = positions[i][0];
+			//gets where in the line the sphere should be
 			interp = (fTimer - ticount1) / 2;
 			m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
 						
 		}
+		//for after the first loop
 		else if (counter >= uSides)
 		{
+			//gets where the sphere index for what position it is at
 			modual = counter%uSides;
 			v3CurrentPos = positions[i][modual];
 			v3EndPos = positions[i][modual+1];
 			interp = (fTimer - ticount1) / 2;
 		    m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
 		}
+		//only works for first loop
 		else
 		{
 			v3CurrentPos = positions[i][counter];
@@ -142,25 +154,16 @@ void Application::Display(void)
 
 
 
-
+		//increases size of orbit and amount of sides
 		fSize += .5f;
 		uSides += 1;
 
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
-		//LOOOOOOKKKKK HEEEEEER WHEN RETURNING 
-		//YOU WANT TO USE MODUALS TO RESET LIKE THIS 
-		//IF COUNTER>=SIDES
-		//COUNTER%SIDES-1=START
-		//EX 4/3==1-1==0
-		//THE OTHER IS END POINT YOU SHOULD BE ABLE TO FIGURE OUT WHAT I MEAN
-		//THAT IS THEORETICLY HOW TO SET UP REMEMBER YOU LEFT THIS NOTE
-		//YOU MADE IT BIG FOR A REASON
-		//DONT FORGET ABOUT MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-		//SAME HANDLER FOR END TO START CASE
-		//
+
 		
 	}
+	//increses variables after one vertex increase
 	if ((int)fTimer / ticount == 1)
 	{
 		
