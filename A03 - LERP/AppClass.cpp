@@ -83,13 +83,15 @@ void Application::Display(void)
 
 	//what number im on for start and end position
 	static uint counter = 0;
-
+	int modual=0;
 	 float fSize = 1.0f-.05f; //initial size of orbits
 	 uint uSides = 3;
 	 static bool go = true;
+	
 	 static int pos = 0;
 	 static std::vector<std::vector<vector3>> positions;
 	 static std::vector<vector3> positionsToAdd;
+	
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
@@ -105,19 +107,41 @@ void Application::Display(void)
 				positionsToAdd.push_back(vector3(vector3(cos(radions), sin(radions), 0) *fSize));
 				pos += degrees;
 				radions = (PI / 180)*pos;
-
+				
 			}
 		positions.push_back(positionsToAdd);
 		}
 		positionsToAdd.clear();
-
+		static matrix4 m4Model;
 		//calculate the current position
-		vector3 v3CurrentPos = positions[i][counter];
-		v3EndPos = positions[i][counter + 1];
-		interp = (fTimer - ticount1) / 2;
-		
+		vector3 v3CurrentPos;
 
-		matrix4 m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
+		if (counter == uSides-1||counter%uSides==uSides-1)
+		{
+			v3CurrentPos = positions[i][uSides - 1];
+			v3EndPos = positions[i][0];
+			interp = (fTimer - ticount1) / 2;
+			m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
+						
+		}
+		else if (counter >= uSides)
+		{
+			modual = counter%uSides;
+			v3CurrentPos = positions[i][modual];
+			v3EndPos = positions[i][modual+1];
+			interp = (fTimer - ticount1) / 2;
+		    m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
+		}
+		else
+		{
+			v3CurrentPos = positions[i][counter];
+			v3EndPos = positions[i][counter + 1];
+			interp = (fTimer - ticount1) / 2;
+		    m4Model = glm::translate(glm::lerp(v3CurrentPos, v3EndPos, interp));
+		}
+
+
+
 
 		fSize += .5f;
 		uSides += 1;
@@ -139,11 +163,13 @@ void Application::Display(void)
 	}
 	if ((int)fTimer / ticount == 1)
 	{
-
+		
+		
 		counter += 1;
 		ticount += 2;
 		ticount1 += 2;
 	}
+
 	go = false;
 
 	positionsToAdd.clear();
