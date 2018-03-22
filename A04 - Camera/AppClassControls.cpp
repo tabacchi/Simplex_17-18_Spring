@@ -369,6 +369,8 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
+	m_pCameraMngr->ChangeYaw(fAngleY * 3.0f);
+	m_pCameraMngr->ChangePitch(-fAngleX * 3.0f);
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard
@@ -382,9 +384,51 @@ void Application::ProcessKeyboard(void)
 	float fSpeed = 0.1f;
 	float fMultiplier = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-
 	if (fMultiplier)
 		fSpeed *= 5.0f;
+
+	vector3 m_v3Forward = glm::normalize(m_pCamera->GetTarget() - m_pCamera->GetPosition());
+	vector3 m_v3Upward = glm::normalize(m_pCamera->GetUp());
+	vector3 m_v3Rightward = glm::normalize(glm::cross(m_v3Forward, m_v3Upward));
+
+	//to move forward
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
+		m_pCamera->SetPositionTargetAndUp(
+			m_pCamera->GetPosition() += m_v3Forward*fSpeed, //Where my eyes are
+			m_pCamera->GetTarget()+=m_v3Forward*fSpeed, //where what I'm looking at is
+			m_pCamera->GetUp() += m_v3Forward*fSpeed);					//what is up		
+	}
+		
+	
+	//to move left tilts the camera 
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		m_pCamera->SetPositionTargetAndUp(
+			m_pCamera->GetPosition() += vector3(1,0,0)*-fSpeed, //Where my eyes are
+			m_pCamera->GetTarget() += vector3(1, 0, 0)*-fSpeed, //where what I'm looking at is
+			m_pCamera->GetUp());					//what is up		
+	}
+
+	//moves backwards
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	{
+		m_pCamera->SetPositionTargetAndUp(
+			m_pCamera->GetPosition() += m_v3Forward*-fSpeed, //Where my eyes are
+			m_pCamera->GetTarget() += m_v3Forward*-fSpeed, //where what I'm looking at is
+			m_pCamera->GetUp() += m_v3Forward*-fSpeed);					//what is up		
+	}
+	
+	//moves right tilts camera
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		m_pCamera->SetPositionTargetAndUp(
+			m_pCamera->GetPosition() += vector3(1, 0, 0)*fSpeed, //Where my eyes are
+			m_pCamera->GetTarget() += vector3(1, 0, 0)*fSpeed, //where what I'm looking at is
+			m_pCamera->GetUp() );					//what is up		
+	}
+
+
 #pragma endregion
 }
 //Joystick
@@ -409,6 +453,11 @@ void Application::ProcessJoystick(void)
 		fHorizontalSpeed *= 3.0f;
 		fVerticalSpeed *= 3.0f;
 	}
+
+	m_pCameraMngr->MoveForward(fForwardSpeed);
+	m_pCameraMngr->MoveSideways(fHorizontalSpeed);
+	m_pCameraMngr->MoveVertical(fVerticalSpeed);
+
 #pragma endregion
 #pragma region Camera Orientation
 	//Change the Yaw and the Pitch of the camera

@@ -16,6 +16,9 @@ class MyCamera
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Up = vector3(0.0f, 1.0f, 0.0f); //What is up
 
+	//vector3 m_v3Forward = glm::normalize(m_v3Target - m_v3Position);
+	
+
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
 	float m_fFOV = 45.0f; //Field of View
@@ -108,6 +111,8 @@ public:
 	OUTPUT: ---
 	*/
 	void SetTarget(vector3 a_v3Target);
+
+	vector3 GetTarget(vector3 a_v3Target);
 
 	/*
 	USAGE: Gets the position of the camera
