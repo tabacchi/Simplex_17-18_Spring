@@ -286,7 +286,102 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
+	//intialize variables i need
+	vector3 Box1 = GetCenterGlobal();
+	vector3 Box2 = a_pOther->GetCenterGlobal();
+	vector3 t = Box2 - Box1;
+	vector3 trans = vector3(glm::dot(t.x, Box1.x), glm::dot(t.y, Box1.y), glm::dot(t.z, Box1.z));
+	vector3 box2Halfwidth = a_pOther->GetHalfWidth();
+	vector3 box1Halfwidth = GetHalfWidth();
 
-	//there is no axis test that separates this two objects
+	float ra, rb;
+	matrix3 R, aBSr;
+
+	//gets cross product
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			R[i][j] = glm::dot(Box1[i], Box2[j]);
+		}
+	}
+	//makes sure its not zero
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			aBSr[i][j] = abs(R[i][j])+.00001f;
+		}
+	}
+
+	//tests a axis
+	for (int i = 0; i < 3; i++)
+	{
+		ra = box1Halfwidth[i];
+		rb = box2Halfwidth[0] * aBSr[i][0] + box2Halfwidth[1] * aBSr[i][1] + box2Halfwidth[2] * aBSr[i][2];
+		if (abs(trans[i]) > ra + rb)
+			return 1;
+	}
+	//tests b axis
+	for (int i = 0; i < 3; i++)
+	{
+		ra = box1Halfwidth[0] * aBSr[0][i] + box1Halfwidth[1] * aBSr[1][i] + box1Halfwidth[2] * aBSr[2][i];;
+		rb = box2Halfwidth[i];
+		if (abs(trans[0]*R[0][i]+trans[1]*R[1][i]+trans[2]*R[2][i]) > ra + rb)
+			return 1;
+	}
+	//test a0xb0
+	ra = box1Halfwidth[1] * aBSr[2][0] + box1Halfwidth[2] * aBSr[1][0]; 
+	rb = box2Halfwidth[1] * aBSr[0][2] + box2Halfwidth[2] * aBSr[0][1]; 
+	if (abs(trans[2] * R[1][0] - trans[1] * R[2][0]) > ra + rb)
+		return eSATResults::SAT_AXxBX;
+	//test a0xb1
+	ra = box1Halfwidth[1] * aBSr[2][1] + box1Halfwidth[2] * aBSr[1][1];
+	rb = box2Halfwidth[0] * aBSr[0][2] + box2Halfwidth[2] * aBSr[0][0];
+	if (abs(trans[2] * R[1][1] - trans[1] * R[2][1]) > ra + rb) 
+		return eSATResults::SAT_AXxBY;
+	//test a0xb2
+	ra = box1Halfwidth[1] * aBSr[2][2] + box1Halfwidth[2] * aBSr[1][2];
+	rb = box2Halfwidth[0] * aBSr[0][1] + box2Halfwidth[1] * aBSr[0][0];
+	if (abs(trans[2] * R[1][2] - trans[1] * R[2][2]) > ra + rb)
+		return eSATResults::SAT_AXxBZ;
+	//test a1xb0
+	ra = box1Halfwidth[0] * aBSr[2][0] + box1Halfwidth[2] * aBSr[0][0];
+	rb = box2Halfwidth[1] * aBSr[1][2] + box2Halfwidth[2] * aBSr[1][1];
+	if ((trans[0] * R[2][0] - trans[2] * R[0][0]) > ra + rb) 
+		return eSATResults::SAT_AYxBX;
+	//test a1xb1
+	ra = box1Halfwidth[0] * aBSr[2][1] + box1Halfwidth[2] * aBSr[0][1];
+	rb = box2Halfwidth[0] * aBSr[1][2] + box2Halfwidth[2] * aBSr[1][0];
+	if (abs(trans[0] * R[2][1] - trans[2] * R[0][1]) > ra + rb) 
+		return eSATResults::SAT_AYxBY;
+	//test a1xb2
+	ra = box1Halfwidth[0] * aBSr[2][2] + box1Halfwidth[2] * aBSr[0][2];
+	rb = box2Halfwidth[0] * aBSr[1][1] + box2Halfwidth[1] * aBSr[1][0];
+	if (abs(trans[0] * R[2][2] - trans[2] * R[0][2]) > ra + rb) 
+		return eSATResults::SAT_AYxBZ;
+	//test a2xb0
+	ra = box1Halfwidth[0] * aBSr[1][0] + box1Halfwidth[1] * aBSr[0][0];
+	rb = box2Halfwidth[1] * aBSr[2][2] + box2Halfwidth[2] * aBSr[2][1];
+	if (abs(trans[1] * R[0][0] - trans[0] * R[1][0]) > ra + rb)
+		return eSATResults::SAT_AZxBX;
+	//test a2xb1
+	ra = box1Halfwidth[0] * aBSr[1][1] + box1Halfwidth[1] * aBSr[0][1];
+	rb = box2Halfwidth[0] * aBSr[2][2] + box2Halfwidth[2] * aBSr[2][0];
+	if (abs(trans[1] * R[0][1] - trans[0] * R[1][1]) > ra + rb) 
+		return eSATResults::SAT_AZxBY;
+	//test a2xb2
+	ra = box1Halfwidth[0] * aBSr[1][2] + box1Halfwidth[1] * aBSr[0][2];
+	rb = box2Halfwidth[0] * aBSr[2][1] + box2Halfwidth[1] * aBSr[2][0];
+	if (abs(trans[1] * R[0][2] - trans[0] * R[1][2]) > ra + rb) 
+		return eSATResults::SAT_AZxBZ;
+
 	return eSATResults::SAT_NONE;
+
+
+	
+
+
+
+	//return eSATResults::SAT_NONE;
 }
