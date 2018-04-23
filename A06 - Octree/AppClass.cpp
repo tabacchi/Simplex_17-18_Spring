@@ -9,6 +9,7 @@ void Application::InitVariables(void)
 		AXIS_Y);					//Up
 
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
+	
 
 #ifdef DEBUG
 	uint uInstances = 900;
@@ -27,9 +28,47 @@ void Application::InitVariables(void)
 			vector3 v3Position = vector3(glm::sphericalRand(34.0f));
 			matrix4 m4Position = glm::translate(v3Position);
 			m_pEntityMngr->SetModelMatrix(m4Position);
+			
+			//hard coding the octree
+				if (v3Position.x < 0)
+				{
+					if (v3Position.y < 0)
+					{
+						if (v3Position.z < 0)
+							m_pEntityMngr->AddDimension(-1, 1);
+						else
+							m_pEntityMngr->AddDimension(-1, 2);
+					}
+					else
+					{
+						if (v3Position.z < 0)
+							m_pEntityMngr->AddDimension(-1, 3);
+						else
+							m_pEntityMngr->AddDimension(-1, 4);
+					}
+				}
+				else
+				{
+					if (v3Position.y < 0)
+					{
+						if (v3Position.z < 0)
+							m_pEntityMngr->AddDimension(-1, 5);
+						else
+							m_pEntityMngr->AddDimension(-1, 6);
+					}
+					else
+					{
+						if (v3Position.z < 0)
+							m_pEntityMngr->AddDimension(-1, 7);
+						else
+							m_pEntityMngr->AddDimension(-1, 8);
+					}
+				}
+			
 		}
+
 	}
-	m_uOctantLevels = 1;
+	//m_uOctantLevels = 1;
 	m_pEntityMngr->Update();
 }
 void Application::Update(void)
